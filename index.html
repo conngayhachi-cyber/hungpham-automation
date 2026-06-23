@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hưng Phạm Automation - Giải Pháp Tự Động Hóa 3D</title>
+    <!-- Favicon -->
+    <link rel="icon" href="logo.png" type="image/png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -577,15 +579,15 @@
     <header class="fixed top-0 left-0 w-full z-50 backdrop-blur-md border-b border-white/5" style="background: var(--bg-header, rgba(5,7,12,0.85));">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <!-- Logo Hưng Phạm Automation -->
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#00F2FE] to-[#a855f7] flex items-center justify-center font-bold text-black heading-tech">
-                    HP
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                    <img src="logo.png" alt="HP Logo" class="w-full h-full object-cover">
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-lg font-bold tracking-wider heading-tech text-white leading-none">HƯNG PHẠM</span>
+                    <span class="text-lg font-bold tracking-wider heading-tech text-white leading-none group-hover:text-[#00F2FE] transition-colors duration-300">HƯNG PHẠM</span>
                     <span class="text-[10px] text-[#00F2FE] tracking-[0.25em] font-semibold">AUTOMATION</span>
                 </div>
-            </div>
+            </a>
             
             <!-- Menu -->
             <nav class="hidden md:flex space-x-8 text-sm font-medium tracking-wide text-gray-400">
