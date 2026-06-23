@@ -1224,16 +1224,31 @@
             document.body.classList.add('theme-transition');
         }, 100);
 
-        // ==================== ẨN LOADING SPLINE 3D ====================
+        // ==================== ẨN LOADING & WATERMARK SPLINE 3D ====================
         const splineViewer = document.querySelector('spline-viewer');
         const loadingScreen = document.getElementById('spline-loading');
+
+        function removeSplineBranding() {
+            if (splineViewer && splineViewer.shadowRoot) {
+                const logo = splineViewer.shadowRoot.querySelector('#logo');
+                const hint = splineViewer.shadowRoot.querySelector('#hint');
+                if (logo) logo.style.display = 'none';
+                if (hint) hint.style.display = 'none';
+            }
+        }
+
         if (splineViewer && loadingScreen) {
             splineViewer.addEventListener('load', () => {
+                // Ẩn màn hình loading
                 loadingScreen.classList.add('opacity-0');
                 setTimeout(() => {
                     loadingScreen.classList.add('hidden');
                 }, 500);
+                
+                // Xóa logo và hướng dẫn kéo thả
+                removeSplineBranding();
             });
+
             // Fallback: Tự động ẩn sau 12 giây nếu tải quá lâu hoặc lỗi
             setTimeout(() => {
                 if (!loadingScreen.classList.contains('hidden')) {
@@ -1241,6 +1256,16 @@
                     setTimeout(() => loadingScreen.classList.add('hidden'), 500);
                 }
             }, 12000);
+
+            // Chạy kiểm tra liên tục để ẩn logo & hint ngay khi được chèn vào shadow DOM
+            let attempts = 0;
+            const brandingInterval = setInterval(() => {
+                removeSplineBranding();
+                attempts++;
+                if (attempts > 50) {
+                    clearInterval(brandingInterval);
+                }
+            }, 200);
         }
 
         // ==================== CHATBOX AI ====================
