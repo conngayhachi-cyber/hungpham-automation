@@ -941,29 +941,13 @@
                 </div>
             </div>
             <div class="chat-header-actions">
-                <button onclick="toggleChatSettings()" title="Cài đặt API Key" class="hover:text-[#00F2FE] transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </button>
-                <button onclick="clearChat()" title="Xoá chat" class="hover:text-red-500 transition-colors duration-200">
+                <button onclick="clearChat()" title="Xoá chat">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
-                <button onclick="toggleChat()" title="Đóng" class="hover:text-red-500 transition-colors duration-200">
+                <button onclick="toggleChat()" title="Đóng">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-        </div>
-
-        <!-- Settings Panel for API Key (Thanh cấu hình API Key) -->
-        <div id="chatSettingsPanel" class="hidden px-4 py-3 border-b flex flex-col gap-2 text-xs transition-all duration-300 shadow-inner" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08);">
-            <div class="flex items-center justify-between">
-                <span class="font-semibold text-gray-400" data-i18n="chat.key.title">Cấu hình OpenRouter API Key</span>
-                <a href="https://openrouter.ai/keys" target="_blank" class="text-[#00F2FE] hover:underline font-medium" data-i18n="chat.key.get">Lấy key tại đây ↗</a>
-            </div>
-            <div class="flex gap-2">
-                <input type="password" id="apiKeyInput" data-i18n="chat.key.placeholder" placeholder="Nhập OpenRouter API Key (sk-or-v1-...)" class="flex-1 bg-black/30 border rounded px-2.5 py-1.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#00F2FE]" style="border-color: rgba(255,255,255,0.12);">
-                <button onclick="saveApiKey()" class="px-4 py-1.5 rounded bg-[#00F2FE] hover:bg-[#00F2FE]/90 text-black font-semibold transition duration-300" data-i18n="chat.key.save">Lưu</button>
-            </div>
-            <p class="text-[10px] text-gray-500 leading-relaxed" data-i18n="chat.key.note">🔑 Key của bạn được lưu an toàn ở trình duyệt cục bộ (localStorage), không đẩy lên GitHub.</p>
         </div>
 
         <!-- Messages -->
@@ -1130,23 +1114,9 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (t[key] !== undefined) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = t[key];
-                    } else {
-                        el.textContent = t[key];
-                    }
+                    el.textContent = t[key];
                 }
             });
-
-            // Cập nhật trạng thái API Key
-            const statusEl = document.getElementById('chatModelStatus');
-            if (statusEl) {
-                if (typeof OPENROUTER_API_KEY !== 'undefined' && OPENROUTER_API_KEY) {
-                    statusEl.innerText = lang === 'vi' ? '🟢 Sẵn sàng' : '🟢 Ready';
-                } else {
-                    statusEl.innerText = lang === 'vi' ? '🔴 Thiếu API Key' : '🔴 Missing API Key';
-                }
-            }
 
             // Cập nhật lang attribute
             document.documentElement.lang = lang === 'en' ? 'en' : 'vi';
@@ -1260,7 +1230,6 @@
         // ==================== KHỞI TẠO ====================
         applyTheme(currentTheme);
         applyLanguage(currentLang);
-        initApiKey();
 
         // Tắt transition khi load để tránh flash
         setTimeout(() => {
@@ -1312,57 +1281,11 @@
         }
 
         // ==================== CHATBOX AI ====================
-        let OPENROUTER_API_KEY = localStorage.getItem('openrouter_key') || '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';
+        const OPENROUTER_API_KEY = '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';
         const AI_MODEL = 'cohere/north-mini-code:free';
 
         let chatAbortController = null;
         let chatHistory = [];
-
-        function initApiKey() {
-            const keyInput = document.getElementById('apiKeyInput');
-            const statusEl = document.getElementById('chatModelStatus');
-            const settingsPanel = document.getElementById('chatSettingsPanel');
-            
-            if (OPENROUTER_API_KEY) {
-                if (keyInput) keyInput.value = OPENROUTER_API_KEY;
-                if (statusEl) {
-                    statusEl.innerText = currentLang === 'vi' ? '🟢 Sẵn sàng' : '🟢 Ready';
-                }
-            } else {
-                if (statusEl) {
-                    statusEl.innerText = currentLang === 'vi' ? '🔴 Thiếu API Key' : '🔴 Missing API Key';
-                }
-                // Nếu chưa có API Key, tự động mở panel cài đặt để người dùng cấu hình
-                if (settingsPanel) settingsPanel.classList.remove('hidden');
-            }
-        }
-
-        function saveApiKey() {
-            const input = document.getElementById('apiKeyInput');
-            if (!input) return;
-            const val = input.value.trim();
-            if (val) {
-                localStorage.setItem('openrouter_key', val);
-                OPENROUTER_API_KEY = val;
-                alert(currentLang === 'vi' ? 'Đã lưu API Key thành công!' : 'API Key saved successfully!');
-                initApiKey();
-                // Ẩn panel cài đặt sau khi lưu thành công
-                const settingsPanel = document.getElementById('chatSettingsPanel');
-                if (settingsPanel) settingsPanel.classList.add('hidden');
-            } else {
-                localStorage.removeItem('openrouter_key');
-                OPENROUTER_API_KEY = '';
-                alert(currentLang === 'vi' ? 'Đã xóa API Key!' : 'API Key removed!');
-                initApiKey();
-            }
-        }
-
-        function toggleChatSettings() {
-            const settingsPanel = document.getElementById('chatSettingsPanel');
-            if (settingsPanel) {
-                settingsPanel.classList.toggle('hidden');
-            }
-        }
 
         function toggleChat() {
             document.getElementById('chatPanel').classList.toggle('open');
@@ -1425,22 +1348,6 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
-
-            if (!OPENROUTER_API_KEY) {
-                // Hiển thị tin nhắn người dùng nhập trước
-                addMessage('user', escHtml(text));
-                input.value = '';
-                autoResizeChatInput();
-                showTyping();
-                setTimeout(() => {
-                    removeTyping();
-                    const warningMsg = currentLang === 'vi'
-                        ? '⚠️ Vui lòng nhập OpenRouter API Key ở mục Cài đặt (nhấn biểu tượng ⚙️ ở phía trên góc phải) để bắt đầu trò chuyện với AI.'
-                        : '⚠️ Please enter your OpenRouter API Key in the Settings (click the ⚙️ icon on the top right) to start chatting with AI.';
-                    addMessage('error', warningMsg);
-                }, 600);
-                return;
-            }
 
             input.value = '';
             autoResizeChatInput();
