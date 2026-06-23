@@ -566,55 +566,9 @@
             box-shadow: 0 20px 40px rgba(168, 85, 247, 0.12) !important;
         }
 
-        /* ===== SMOOTH PAGE TRANSITION OVERLAY ===== */
-        #transition-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-            pointer-events: none;
-            background: rgba(5, 7, 12, 0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            opacity: 0;
-            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        [data-theme="light"] #transition-overlay {
-            background: rgba(240, 244, 248, 0.85) !important;
-        }
-        #transition-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .transition-loader {
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        #transition-overlay.active .transition-loader {
-            opacity: 1;
-            transform: scale(1);
-        }
     </style>
 </head>
 <body class="text-gray-200 overflow-x-hidden relative">
-
-    <!-- Smooth Page Transition Overlay -->
-    <div id="transition-overlay">
-        <div class="transition-loader flex flex-col items-center gap-3">
-            <div class="relative w-12 h-12 flex items-center justify-center">
-                <!-- Outer glowing ring -->
-                <div class="absolute inset-0 rounded-full border-2 border-[#00F2FE] border-t-transparent animate-spin"></div>
-                <!-- Inner pulse circle -->
-                <div class="w-6 h-6 rounded-full bg-[#a855f7]/30 animate-ping"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- Quầng sáng động bám theo chuột -->
     <div id="custom-glow" class="hidden md:block"></div>
@@ -1573,40 +1527,6 @@
         }, { threshold: 0.05 });
         if (splineViewer) splineObs.observe(splineViewer);
 
-        // ==================== HIỆU ỨNG CHUYỂN TRANG MƯỢT MÀ ====================
-        const transitionOverlay = document.getElementById('transition-overlay');
-        document.querySelectorAll('a[href^="#"], a[href="index.html"]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                let targetEl = null;
-                if (href === '#' || href === 'index.html') {
-                    targetEl = document.documentElement;
-                } else if (href.startsWith('#')) {
-                    targetEl = document.querySelector(href);
-                }
-                
-                if (!targetEl) return;
-                e.preventDefault();
-                
-                // Bật hiệu ứng chuyển cảnh mượt mà (fade & blur)
-                transitionOverlay.classList.add('active');
-                
-                setTimeout(() => {
-                    // Tắt tạm thời scroll-behavior smooth để nhảy lập tức
-                    const origBehavior = document.documentElement.style.scrollBehavior;
-                    document.documentElement.style.scrollBehavior = 'auto';
-                    targetEl.scrollIntoView({ block: 'start' });
-                    
-                    // Tắt hiệu ứng chuyển trang
-                    transitionOverlay.classList.remove('active');
-                    
-                    setTimeout(() => {
-                        // Khôi phục lại scroll-behavior ban đầu
-                        document.documentElement.style.scrollBehavior = origBehavior || 'smooth';
-                    }, 300);
-                }, 300);
-            });
-        });
     </script>
 </body>
 </html>
