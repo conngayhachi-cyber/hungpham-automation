@@ -565,9 +565,54 @@
             border-color: rgba(168, 85, 247, 0.4) !important;
             box-shadow: 0 20px 40px rgba(168, 85, 247, 0.12) !important;
         }
+
+        /* ===== 3D PAGE TRANSITION OVERLAY ===== */
+        #transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            pointer-events: none;
+            display: flex;
+            perspective: 1200px;
+        }
+        .transition-panel {
+            flex: 1;
+            height: 100%;
+            background: linear-gradient(135deg, #05070c, #0a0e17);
+            border-left: 1px solid rgba(0, 242, 254, 0.15);
+            border-right: 1px solid rgba(168, 85, 247, 0.15);
+            transform: rotateY(-90deg);
+            transform-origin: left center;
+            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease;
+            opacity: 0;
+        }
+        [data-theme="light"] .transition-panel {
+            background: linear-gradient(135deg, #f0f4f8, #e2e8f0) !important;
+            border-left-color: rgba(0, 242, 254, 0.3) !important;
+            border-right-color: rgba(168, 85, 247, 0.3) !important;
+        }
+        #transition-overlay.active .transition-panel {
+            transform: rotateY(0deg);
+            opacity: 1;
+        }
+        #transition-overlay.reveal .transition-panel {
+            transform: rotateY(90deg);
+            opacity: 0;
+        }
     </style>
 </head>
 <body class="text-gray-200 overflow-x-hidden relative">
+
+    <!-- 3D Shutter Page Transition Overlay -->
+    <div id="transition-overlay">
+        <div class="transition-panel"></div>
+        <div class="transition-panel"></div>
+        <div class="transition-panel"></div>
+        <div class="transition-panel"></div>
+    </div>
 
     <!-- Quầng sáng động bám theo chuột -->
     <div id="custom-glow" class="hidden md:block"></div>
@@ -1510,6 +1555,59 @@
         }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
         
         revealElements.forEach(el => revealObserver.observe(el));
+
+        // ==================== TỐI ƯU HÓA HIỆU NĂNG SPLINE 3D (GIẢM LAG KHI CUỘN) ====================
+        const splineObs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const viewer = entry.target;
+                if (entry.isIntersecting) {
+                    viewer.style.visibility = 'visible';
+                    viewer.style.pointerEvents = 'auto';
+                } else {
+                    viewer.style.visibility = 'hidden';
+                    viewer.style.pointerEvents = 'none';
+                }
+            });
+        }, { threshold: 0.05 });
+        if (splineViewer) splineObs.observe(splineViewer);
+
+        // ==================== HIỆU ỨNG CHUYỂN TRANG 3D SHUTTER ====================
+        const transitionOverlay = document.getElementById('transition-overlay');
+        document.querySelectorAll('a[href^="#"], a[href="index.html"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                let targetEl = null;
+                if (href === '#' || href === 'index.html') {
+                    targetEl = document.documentElement;
+                } else if (href.startsWith('#')) {
+                    targetEl = document.querySelector(href);
+                }
+                
+                if (!targetEl) return;
+                e.preventDefault();
+                
+                // Bật hiệu ứng 3D Shutter bao phủ màn hình
+                transitionOverlay.classList.remove('reveal');
+                transitionOverlay.classList.add('active');
+                
+                setTimeout(() => {
+                    // Tắt tạm thời scroll-behavior smooth để nhảy lập tức
+                    const origBehavior = document.documentElement.style.scrollBehavior;
+                    document.documentElement.style.scrollBehavior = 'auto';
+                    targetEl.scrollIntoView({ block: 'start' });
+                    
+                    // Kích hoạt trạng thái mở màn hình (reveal)
+                    transitionOverlay.classList.remove('active');
+                    transitionOverlay.classList.add('reveal');
+                    
+                    setTimeout(() => {
+                        // Khôi phục lại scroll-behavior ban đầu
+                        document.documentElement.style.scrollBehavior = origBehavior || 'smooth';
+                        transitionOverlay.classList.remove('reveal');
+                    }, 600);
+                }, 600);
+            });
+        });
     </script>
 </body>
 </html>
