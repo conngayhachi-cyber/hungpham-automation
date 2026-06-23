@@ -566,7 +566,7 @@
             box-shadow: 0 20px 40px rgba(168, 85, 247, 0.12) !important;
         }
 
-        /* ===== 3D PAGE TRANSITION OVERLAY ===== */
+        /* ===== SMOOTH PAGE TRANSITION OVERLAY ===== */
         #transition-overlay {
             position: fixed;
             top: 0;
@@ -575,43 +575,45 @@
             height: 100vh;
             z-index: 9999;
             pointer-events: none;
+            background: rgba(5, 7, 12, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
-            perspective: 1200px;
+            align-items: center;
+            justify-content: center;
         }
-        .transition-panel {
-            flex: 1;
-            height: 100%;
-            background: linear-gradient(135deg, #05070c, #0a0e17);
-            border-left: 1px solid rgba(0, 242, 254, 0.15);
-            border-right: 1px solid rgba(168, 85, 247, 0.15);
-            transform: rotateY(-90deg);
-            transform-origin: left center;
-            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease;
-            opacity: 0;
+        [data-theme="light"] #transition-overlay {
+            background: rgba(240, 244, 248, 0.85) !important;
         }
-        [data-theme="light"] .transition-panel {
-            background: linear-gradient(135deg, #f0f4f8, #e2e8f0) !important;
-            border-left-color: rgba(0, 242, 254, 0.3) !important;
-            border-right-color: rgba(168, 85, 247, 0.3) !important;
-        }
-        #transition-overlay.active .transition-panel {
-            transform: rotateY(0deg);
+        #transition-overlay.active {
             opacity: 1;
+            pointer-events: auto;
         }
-        #transition-overlay.reveal .transition-panel {
-            transform: rotateY(90deg);
+        .transition-loader {
             opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        #transition-overlay.active .transition-loader {
+            opacity: 1;
+            transform: scale(1);
         }
     </style>
 </head>
 <body class="text-gray-200 overflow-x-hidden relative">
 
-    <!-- 3D Shutter Page Transition Overlay -->
+    <!-- Smooth Page Transition Overlay -->
     <div id="transition-overlay">
-        <div class="transition-panel"></div>
-        <div class="transition-panel"></div>
-        <div class="transition-panel"></div>
-        <div class="transition-panel"></div>
+        <div class="transition-loader flex flex-col items-center gap-3">
+            <div class="relative w-12 h-12 flex items-center justify-center">
+                <!-- Outer glowing ring -->
+                <div class="absolute inset-0 rounded-full border-2 border-[#00F2FE] border-t-transparent animate-spin"></div>
+                <!-- Inner pulse circle -->
+                <div class="w-6 h-6 rounded-full bg-[#a855f7]/30 animate-ping"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Quầng sáng động bám theo chuột -->
@@ -1571,7 +1573,7 @@
         }, { threshold: 0.05 });
         if (splineViewer) splineObs.observe(splineViewer);
 
-        // ==================== HIỆU ỨNG CHUYỂN TRANG 3D SHUTTER ====================
+        // ==================== HIỆU ỨNG CHUYỂN TRANG MƯỢT MÀ ====================
         const transitionOverlay = document.getElementById('transition-overlay');
         document.querySelectorAll('a[href^="#"], a[href="index.html"]').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -1586,8 +1588,7 @@
                 if (!targetEl) return;
                 e.preventDefault();
                 
-                // Bật hiệu ứng 3D Shutter bao phủ màn hình
-                transitionOverlay.classList.remove('reveal');
+                // Bật hiệu ứng chuyển cảnh mượt mà (fade & blur)
                 transitionOverlay.classList.add('active');
                 
                 setTimeout(() => {
@@ -1596,16 +1597,14 @@
                     document.documentElement.style.scrollBehavior = 'auto';
                     targetEl.scrollIntoView({ block: 'start' });
                     
-                    // Kích hoạt trạng thái mở màn hình (reveal)
+                    // Tắt hiệu ứng chuyển trang
                     transitionOverlay.classList.remove('active');
-                    transitionOverlay.classList.add('reveal');
                     
                     setTimeout(() => {
                         // Khôi phục lại scroll-behavior ban đầu
                         document.documentElement.style.scrollBehavior = origBehavior || 'smooth';
-                        transitionOverlay.classList.remove('reveal');
-                    }, 600);
-                }, 600);
+                    }, 300);
+                }, 300);
             });
         });
     </script>
